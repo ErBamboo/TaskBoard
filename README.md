@@ -44,6 +44,16 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
+如果你要打包 Windows 客户端，也要补上：
+
+```env
+NEXT_PUBLIC_DESKTOP_APP_URL=https://你的真实公网地址
+```
+
+桌面打包脚本会自动读取项目根目录的 `.env` 和 `.env.local`，并自动补上常见的 Rust `cargo` 路径；不需要再手工先把这些变量注入 PowerShell 会话。
+如果缺少 `NEXT_PUBLIC_DESKTOP_APP_URL`，桌面打包会直接失败，避免误生成一个仍然指向 `task-board.example.com` 的错误安装包。
+Windows 下的 `npm run tauri:build` 和 `npm run tauri:dev` 会通过项目内包装脚本启动，不要求 `node` 单独出现在系统 `PATH` 里。
+
 3. 初始化数据库
 
 在 Supabase SQL 编辑器中依次执行：
@@ -108,6 +118,7 @@ npm run dev
 npm run test
 npm run typecheck
 npm run build
+npm run tauri:build
 npx playwright test
 ```
 

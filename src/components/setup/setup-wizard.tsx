@@ -8,6 +8,14 @@ import { MemberImportStep } from "@/components/setup/member-import-step";
 import { ProjectTemplateStep } from "@/components/setup/project-template-step";
 import { TeamBasicsStep } from "@/components/setup/team-basics-step";
 import {
+  createEmptyMemberDraft,
+  createEmptyProjectDraft,
+  serializeMemberDrafts,
+  serializeProjectDrafts,
+  type SetupMemberDraft,
+  type SetupProjectDraft,
+} from "@/features/setup/setup-drafts";
+import {
   initialSetupActionState,
   type SetupMemberInput,
   type SetupProjectInput,
@@ -40,20 +48,6 @@ const setupStepDefinitions = [
   },
 ] as const;
 
-function createEmptyProject(): SetupProjectInput {
-  return {
-    name: "",
-    description: "",
-  };
-}
-
-function createEmptyMember(): SetupMemberInput {
-  return {
-    displayName: "",
-    email: "",
-  };
-}
-
 function SetupSubmitButton() {
   const { pending } = useFormStatus();
 
@@ -70,8 +64,8 @@ function SetupSubmitButton() {
 
 function getStepValidationMessage(
   currentStep: number,
-  members: SetupMemberInput[],
-  projects: SetupProjectInput[],
+  members: SetupMemberDraft[],
+  projects: SetupProjectDraft[],
   seasonName: string,
   teamName: string,
 ) {
@@ -114,11 +108,11 @@ export function SetupWizard({ defaults }: SetupWizardProperties) {
   const [localStepMessage, setLocalStepMessage] = useState("");
   const [teamName, setTeamName] = useState(defaults.teamName);
   const [seasonName, setSeasonName] = useState(defaults.seasonName);
-  const [projects, setProjects] = useState<SetupProjectInput[]>([
-    createEmptyProject(),
+  const [projects, setProjects] = useState<SetupProjectDraft[]>([
+    createEmptyProjectDraft(),
   ]);
-  const [members, setMembers] = useState<SetupMemberInput[]>([
-    createEmptyMember(),
+  const [members, setMembers] = useState<SetupMemberDraft[]>([
+    createEmptyMemberDraft(),
   ]);
   const effectiveCurrentStep =
     setupActionState.status === "success"
@@ -271,8 +265,16 @@ export function SetupWizard({ defaults }: SetupWizardProperties) {
       <form action={setupFormAction} className="grid gap-6">
         <input type="hidden" name="teamName" value={teamName} />
         <input type="hidden" name="seasonName" value={seasonName} />
-        <input type="hidden" name="projects" value={JSON.stringify(projects)} />
-        <input type="hidden" name="members" value={JSON.stringify(members)} />
+        <input
+          type="hidden"
+          name="projects"
+          value={JSON.stringify(serializeProjectDrafts(projects))}
+        />
+        <input
+          type="hidden"
+          name="members"
+          value={JSON.stringify(serializeMemberDrafts(members))}
+        />
 
         <section className="grid gap-5 rounded-[1.5rem] border border-[var(--color-line)] bg-[rgba(255,255,255,0.72)] p-5">
           <div className="space-y-2">
@@ -298,7 +300,7 @@ export function SetupWizard({ defaults }: SetupWizardProperties) {
               addProject={() =>
                 setProjects((currentProjects) => [
                   ...currentProjects,
-                  createEmptyProject(),
+                  createEmptyProjectDraft(),
                 ])
               }
               projects={projects}
@@ -316,7 +318,7 @@ export function SetupWizard({ defaults }: SetupWizardProperties) {
               addMember={() =>
                 setMembers((currentMembers) => [
                   ...currentMembers,
-                  createEmptyMember(),
+                  createEmptyMemberDraft(),
                 ])
               }
               members={members}
@@ -345,9 +347,9 @@ export function SetupWizard({ defaults }: SetupWizardProperties) {
                   初始项目
                 </p>
                 <div className="grid gap-2">
-                  {projects.map((project, index) => (
+                  {projects.map((project) => (
                     <p
-                      key={`${project.name}-${index}`}
+                      key={project.clientId}
                       className="text-sm leading-7 text-[var(--color-muted-strong)]"
                     >
                       {project.name || "未命名项目"}
@@ -361,9 +363,9 @@ export function SetupWizard({ defaults }: SetupWizardProperties) {
                   首批成员
                 </p>
                 <div className="grid gap-2">
-                  {members.map((member, index) => (
+                  {members.map((member) => (
                     <p
-                      key={`${member.email}-${index}`}
+                      key={member.clientId}
                       className="text-sm leading-7 text-[var(--color-muted-strong)]"
                     >
                       {member.displayName || "未命名成员"} / {member.email || "未填写邮箱"}

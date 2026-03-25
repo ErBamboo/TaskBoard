@@ -1,10 +1,11 @@
 "use client";
 
+import type { SetupProjectDraft } from "@/features/setup/setup-drafts";
 import { defaultSubsystemTemplates, type SetupProjectInput } from "@/features/setup/setup-schema";
 
 type ProjectTemplateStepProperties = {
   addProject: () => void;
-  projects: SetupProjectInput[];
+  projects: SetupProjectDraft[];
   removeProject: (index: number) => void;
   updateProject: (
     index: number,
@@ -24,7 +25,7 @@ export function ProjectTemplateStep({
       <div className="grid gap-4">
         {projects.map((project, index) => (
           <article
-            key={`${project.name}-${index}`}
+            key={project.clientId}
             className="grid gap-4 rounded-[1.2rem] border border-[var(--color-line)] bg-[rgba(255,255,255,0.7)] p-4"
           >
             <div className="flex items-center justify-between gap-3">

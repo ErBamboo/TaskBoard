@@ -1,10 +1,11 @@
 "use client";
 
+import type { SetupMemberDraft } from "@/features/setup/setup-drafts";
 import type { SetupMemberInput } from "@/features/setup/setup-schema";
 
 type MemberImportStepProperties = {
   addMember: () => void;
-  members: SetupMemberInput[];
+  members: SetupMemberDraft[];
   removeMember: (index: number) => void;
   updateMember: (
     index: number,
@@ -24,7 +25,7 @@ export function MemberImportStep({
       <div className="grid gap-4">
         {members.map((member, index) => (
           <article
-            key={`${member.email}-${index}`}
+            key={member.clientId}
             className="grid gap-4 rounded-[1.2rem] border border-[var(--color-line)] bg-[rgba(255,255,255,0.7)] p-4 md:grid-cols-[0.8fr_1.2fr_auto]"
           >
             <div className="grid gap-2">
