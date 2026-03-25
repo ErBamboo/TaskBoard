@@ -1,12 +1,22 @@
 "use client";
 
+import { useState } from "react";
+
 import type { SetupProjectDraft } from "@/features/setup/setup-drafts";
 import { defaultSubsystemTemplates, type SetupProjectInput } from "@/features/setup/setup-schema";
 
+const defaultSubsystemTemplateSet = new Set<string>(defaultSubsystemTemplates);
+
 type ProjectTemplateStepProperties = {
+  addCustomSubsystemTemplate: () => void;
   addProject: () => void;
+  customSubsystemName: string;
   projects: SetupProjectDraft[];
   removeProject: (index: number) => void;
+  removeSubsystemTemplate: (subsystemName: string) => void;
+  selectedSubsystemTemplates: string[];
+  setCustomSubsystemName: (value: string) => void;
+  toggleDefaultSubsystemTemplate: (subsystemName: string) => void;
   updateProject: (
     index: number,
     field: keyof SetupProjectInput,
@@ -15,11 +25,37 @@ type ProjectTemplateStepProperties = {
 };
 
 export function ProjectTemplateStep({
+  addCustomSubsystemTemplate,
   addProject,
+  customSubsystemName,
   projects,
   removeProject,
+  removeSubsystemTemplate,
+  selectedSubsystemTemplates,
+  setCustomSubsystemName,
+  toggleDefaultSubsystemTemplate,
   updateProject,
 }: ProjectTemplateStepProperties) {
+  const [subsystemTemplateMessage, setSubsystemTemplateMessage] = useState("");
+  const customSubsystemTemplates = selectedSubsystemTemplates.filter(
+    (subsystemTemplate) => !defaultSubsystemTemplateSet.has(subsystemTemplate),
+  );
+
+  function handleAddCustomSubsystemTemplate() {
+    if (customSubsystemName.trim().length === 0) {
+      setSubsystemTemplateMessage("请输入自定义子系统名称。");
+      return;
+    }
+
+    if (selectedSubsystemTemplates.includes(customSubsystemName.trim())) {
+      setSubsystemTemplateMessage("子系统模板不能重复。");
+      return;
+    }
+
+    setSubsystemTemplateMessage("");
+    addCustomSubsystemTemplate();
+  }
+
   return (
     <div className="grid gap-5">
       <div className="grid gap-4">
@@ -103,15 +139,93 @@ export function ProjectTemplateStep({
         <p className="font-mono text-[0.66rem] uppercase tracking-[0.24em] text-[#106875]">
           默认子系统模板
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {defaultSubsystemTemplates.map((subsystemTemplate) => (
-            <span
+            <label
               key={subsystemTemplate}
-              className="rounded-full border border-[rgba(16,104,117,0.22)] px-3 py-1 text-sm text-[#106875]"
+              className="flex items-center gap-3 rounded-[1rem] border border-[rgba(16,104,117,0.22)] bg-[rgba(255,255,255,0.7)] px-4 py-3 text-sm text-[#106875]"
             >
-              {subsystemTemplate}
-            </span>
+              <input
+                type="checkbox"
+                checked={selectedSubsystemTemplates.includes(subsystemTemplate)}
+                onChange={() => {
+                  setSubsystemTemplateMessage("");
+                  toggleDefaultSubsystemTemplate(subsystemTemplate);
+                }}
+                className="h-4 w-4 rounded border-[rgba(16,104,117,0.4)] text-[#106875] focus:ring-[#106875]"
+              />
+              <span>{subsystemTemplate}</span>
+            </label>
           ))}
+        </div>
+
+        <div className="grid gap-3 rounded-[1rem] border border-[rgba(16,104,117,0.16)] bg-[rgba(255,255,255,0.72)] p-4">
+          <label
+            htmlFor="setup-custom-subsystem-template"
+            className="font-mono text-[0.66rem] uppercase tracking-[0.24em] text-[#106875]"
+          >
+            自定义子系统
+          </label>
+          <div className="flex flex-wrap gap-3">
+            <input
+              id="setup-custom-subsystem-template"
+              type="text"
+              value={customSubsystemName}
+              onChange={(event) => {
+                setSubsystemTemplateMessage("");
+                setCustomSubsystemName(event.currentTarget.value);
+              }}
+              className="min-w-56 flex-1 rounded-[1rem] border border-[rgba(16,104,117,0.18)] bg-[var(--color-panel)] px-4 py-3 text-sm text-[var(--color-ink)] outline-none transition-colors duration-200 focus:border-[var(--color-accent)]"
+              placeholder="例如：裁判系统"
+            />
+            <button
+              type="button"
+              onClick={handleAddCustomSubsystemTemplate}
+              className="rounded-[1rem] border border-[rgba(16,104,117,0.22)] bg-[var(--color-panel)] px-4 py-3 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-[#106875] transition-transform duration-200 hover:-translate-y-0.5"
+            >
+              添加子系统模板
+            </button>
+          </div>
+
+          {customSubsystemTemplates.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {customSubsystemTemplates.map((subsystemTemplate) => (
+                <button
+                  key={subsystemTemplate}
+                  type="button"
+                  onClick={() => {
+                    setSubsystemTemplateMessage("");
+                    removeSubsystemTemplate(subsystemTemplate);
+                  }}
+                  className="rounded-full border border-[rgba(16,104,117,0.22)] px-3 py-1 text-sm text-[#106875]"
+                >
+                  {subsystemTemplate} ×
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          {subsystemTemplateMessage ? (
+            <p className="text-sm leading-7 text-[var(--color-accent)]">
+              {subsystemTemplateMessage}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2">
+          <p className="font-mono text-[0.66rem] uppercase tracking-[0.24em] text-[#106875]">
+            最终启用的子系统
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {selectedSubsystemTemplates.map((subsystemTemplate) => (
+              <span
+                key={subsystemTemplate}
+                className="rounded-full border border-[rgba(16,104,117,0.22)] bg-[rgba(255,255,255,0.75)] px-3 py-1 text-sm text-[#106875]"
+              >
+                {subsystemTemplate}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
     </div>

@@ -15,10 +15,15 @@ export const defaultSubsystemTemplates = [
   "云台",
   "发射机构",
   "视觉",
-  "通信",
-  "电源",
-  "上位机",
+  "导航",
+  "嵌入式",
 ] as const;
+
+const setupSubsystemTemplateSchema = z
+  .string()
+  .trim()
+  .min(1, "请输入有效子系统名称。")
+  .max(24, "子系统名称不能超过 24 个字符。");
 
 export const setupWizardSchema = z
   .object({
@@ -32,10 +37,15 @@ export const setupWizardSchema = z
       .array(setupMemberSchema)
       .min(1, "至少需要导入 1 位成员。")
       .max(20, "初始成员最多导入 20 位。"),
+    subsystemTemplates: z
+      .array(setupSubsystemTemplateSchema)
+      .min(1, "至少需要选择 1 个子系统模板。")
+      .max(12, "子系统模板最多选择 12 项。"),
   })
   .superRefine((value, context) => {
     const projectNames = new Set<string>();
     const memberEmails = new Set<string>();
+    const subsystemTemplateNames = new Set<string>();
 
     value.projects.forEach((project, index) => {
       if (projectNames.has(project.name)) {
@@ -61,6 +71,19 @@ export const setupWizardSchema = z
       }
 
       memberEmails.add(member.email);
+    });
+
+    value.subsystemTemplates.forEach((subsystemTemplate, index) => {
+      if (subsystemTemplateNames.has(subsystemTemplate)) {
+        context.addIssue({
+          code: "custom",
+          message: "子系统模板不能重复。",
+          path: ["subsystemTemplates", index],
+        });
+        return;
+      }
+
+      subsystemTemplateNames.add(subsystemTemplate);
     });
   });
 
@@ -103,5 +126,6 @@ export function parseSetupWizardFormData(
     seasonName: formData.get("seasonName")?.toString(),
     projects: parseJsonField(formData.get("projects"), []),
     members: parseJsonField(formData.get("members"), []),
+    subsystemTemplates: parseJsonField(formData.get("subsystemTemplates"), []),
   });
 }

@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 
 import { MemberImportStep } from "@/components/setup/member-import-step";
 import { ProjectTemplateStep } from "@/components/setup/project-template-step";
+import { defaultSubsystemTemplates } from "@/features/setup/setup-schema";
 import type { SetupMemberInput, SetupProjectInput } from "@/features/setup/setup-schema";
 
 type ProjectDraft = SetupProjectInput & {
@@ -23,12 +24,53 @@ function ProjectTemplateHarness() {
       name: "",
     },
   ]);
+  const [customSubsystemName, setCustomSubsystemName] = useState("");
+  const [selectedSubsystemTemplates, setSelectedSubsystemTemplates] = useState<string[]>(
+    [...defaultSubsystemTemplates],
+  );
 
   return (
     <ProjectTemplateStep
+      addCustomSubsystemTemplate={() => {
+        const normalizedSubsystemName = customSubsystemName.trim();
+
+        if (
+          normalizedSubsystemName.length === 0 ||
+          selectedSubsystemTemplates.includes(normalizedSubsystemName)
+        ) {
+          return;
+        }
+
+        setSelectedSubsystemTemplates((currentSubsystemTemplates) => [
+          ...currentSubsystemTemplates,
+          normalizedSubsystemName,
+        ]);
+        setCustomSubsystemName("");
+      }}
       addProject={() => undefined}
+      customSubsystemName={customSubsystemName}
       projects={projects}
       removeProject={() => undefined}
+      removeSubsystemTemplate={(subsystemName) =>
+        setSelectedSubsystemTemplates((currentSubsystemTemplates) =>
+          currentSubsystemTemplates.filter(
+            (currentSubsystemTemplate) =>
+              currentSubsystemTemplate !== subsystemName,
+          ),
+        )
+      }
+      selectedSubsystemTemplates={selectedSubsystemTemplates}
+      setCustomSubsystemName={setCustomSubsystemName}
+      toggleDefaultSubsystemTemplate={(subsystemName) =>
+        setSelectedSubsystemTemplates((currentSubsystemTemplates) =>
+          currentSubsystemTemplates.includes(subsystemName)
+            ? currentSubsystemTemplates.filter(
+                (currentSubsystemTemplate) =>
+                  currentSubsystemTemplate !== subsystemName,
+              )
+            : [...currentSubsystemTemplates, subsystemName],
+        )
+      }
       updateProject={(index, field, value) => {
         setProjects((currentProjects) =>
           currentProjects.map((project, projectIndex) =>

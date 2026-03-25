@@ -11,7 +11,6 @@ import { getAdminSupabaseClient } from "@/lib/supabase/admin";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
 import { getSetupState } from "@/features/setup/get-setup-state";
 import {
-  defaultSubsystemTemplates,
   initialSetupActionState,
   parseSetupWizardFormData,
   type SetupActionState,
@@ -215,7 +214,7 @@ export async function initializeWorkspaceAction(
   }
 
   const subsystemRows = createdProjects.flatMap((project) =>
-    defaultSubsystemTemplates.map((subsystemName, sortOrder) => ({
+    parsedSetupWizard.subsystemTemplates.map((subsystemName, sortOrder) => ({
       project_id: project.id,
       name: subsystemName,
       description: `${project.name} 默认子系统模板`,

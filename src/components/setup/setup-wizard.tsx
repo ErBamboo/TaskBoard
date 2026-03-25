@@ -16,6 +16,7 @@ import {
   type SetupProjectDraft,
 } from "@/features/setup/setup-drafts";
 import {
+  defaultSubsystemTemplates,
   initialSetupActionState,
   type SetupMemberInput,
   type SetupProjectInput,
@@ -48,6 +49,8 @@ const setupStepDefinitions = [
   },
 ] as const;
 
+const defaultSubsystemTemplateSet = new Set<string>(defaultSubsystemTemplates);
+
 function SetupSubmitButton() {
   const { pending } = useFormStatus();
 
@@ -67,6 +70,7 @@ function getStepValidationMessage(
   members: SetupMemberDraft[],
   projects: SetupProjectDraft[],
   seasonName: string,
+  subsystemTemplates: string[],
   teamName: string,
 ) {
   if (currentStep === 0) {
@@ -82,6 +86,10 @@ function getStepValidationMessage(
 
     if (hasIncompleteProject) {
       return "请补齐每个初始项目的名称。";
+    }
+
+    if (subsystemTemplates.length === 0) {
+      return "至少需要选择 1 个子系统模板。";
     }
   }
 
@@ -108,12 +116,16 @@ export function SetupWizard({ defaults }: SetupWizardProperties) {
   const [localStepMessage, setLocalStepMessage] = useState("");
   const [teamName, setTeamName] = useState(defaults.teamName);
   const [seasonName, setSeasonName] = useState(defaults.seasonName);
+  const [customSubsystemName, setCustomSubsystemName] = useState("");
   const [projects, setProjects] = useState<SetupProjectDraft[]>([
     createEmptyProjectDraft(),
   ]);
   const [members, setMembers] = useState<SetupMemberDraft[]>([
     createEmptyMemberDraft(),
   ]);
+  const [selectedSubsystemTemplates, setSelectedSubsystemTemplates] = useState<string[]>(
+    [...defaultSubsystemTemplates],
+  );
   const effectiveCurrentStep =
     setupActionState.status === "success"
       ? setupStepDefinitions.length - 1
@@ -125,6 +137,7 @@ export function SetupWizard({ defaults }: SetupWizardProperties) {
       members,
       projects,
       seasonName,
+      selectedSubsystemTemplates,
       teamName,
     );
 
@@ -174,6 +187,61 @@ export function SetupWizard({ defaults }: SetupWizardProperties) {
               [field]: value,
             }
           : member,
+      ),
+      );
+  }
+
+  function buildOrderedSubsystemTemplates(nextSubsystemTemplates: readonly string[]) {
+    const uniqueSubsystemTemplates = [...new Set(nextSubsystemTemplates)];
+    const orderedDefaultSubsystemTemplates = defaultSubsystemTemplates.filter(
+      (defaultSubsystemTemplate) =>
+        uniqueSubsystemTemplates.includes(defaultSubsystemTemplate),
+    );
+    const customSubsystemTemplates = uniqueSubsystemTemplates.filter(
+      (subsystemTemplate) =>
+        !defaultSubsystemTemplateSet.has(subsystemTemplate),
+    );
+
+    return [...orderedDefaultSubsystemTemplates, ...customSubsystemTemplates];
+  }
+
+  function toggleDefaultSubsystemTemplate(subsystemName: string) {
+    setLocalStepMessage("");
+    setSelectedSubsystemTemplates((currentSubsystemTemplates) =>
+      currentSubsystemTemplates.includes(subsystemName)
+        ? currentSubsystemTemplates.filter(
+            (currentSubsystemTemplate) =>
+              currentSubsystemTemplate !== subsystemName,
+          )
+        : buildOrderedSubsystemTemplates([
+            ...currentSubsystemTemplates,
+            subsystemName,
+          ]),
+    );
+  }
+
+  function addCustomSubsystemTemplate() {
+    const normalizedSubsystemName = customSubsystemName.trim();
+
+    if (normalizedSubsystemName.length === 0) {
+      return;
+    }
+
+    setSelectedSubsystemTemplates((currentSubsystemTemplates) =>
+      buildOrderedSubsystemTemplates([
+        ...currentSubsystemTemplates,
+        normalizedSubsystemName,
+      ]),
+    );
+    setCustomSubsystemName("");
+    setLocalStepMessage("");
+  }
+
+  function removeSubsystemTemplate(subsystemName: string) {
+    setLocalStepMessage("");
+    setSelectedSubsystemTemplates((currentSubsystemTemplates) =>
+      currentSubsystemTemplates.filter(
+        (currentSubsystemTemplate) => currentSubsystemTemplate !== subsystemName,
       ),
     );
   }
@@ -275,6 +343,11 @@ export function SetupWizard({ defaults }: SetupWizardProperties) {
           name="members"
           value={JSON.stringify(serializeMemberDrafts(members))}
         />
+        <input
+          type="hidden"
+          name="subsystemTemplates"
+          value={JSON.stringify(selectedSubsystemTemplates)}
+        />
 
         <section className="grid gap-5 rounded-[1.5rem] border border-[var(--color-line)] bg-[rgba(255,255,255,0.72)] p-5">
           <div className="space-y-2">
@@ -303,12 +376,18 @@ export function SetupWizard({ defaults }: SetupWizardProperties) {
                   createEmptyProjectDraft(),
                 ])
               }
+              addCustomSubsystemTemplate={addCustomSubsystemTemplate}
+              customSubsystemName={customSubsystemName}
               projects={projects}
               removeProject={(index) =>
                 setProjects((currentProjects) =>
                   currentProjects.filter((_, projectIndex) => projectIndex !== index),
                 )
               }
+              removeSubsystemTemplate={removeSubsystemTemplate}
+              selectedSubsystemTemplates={selectedSubsystemTemplates}
+              setCustomSubsystemName={setCustomSubsystemName}
+              toggleDefaultSubsystemTemplate={toggleDefaultSubsystemTemplate}
               updateProject={updateProject}
             />
           ) : null}
@@ -354,6 +433,22 @@ export function SetupWizard({ defaults }: SetupWizardProperties) {
                     >
                       {project.name || "未命名项目"}
                     </p>
+                  ))}
+                </div>
+              </article>
+
+              <article className="grid gap-3 rounded-[1.2rem] border border-[var(--color-line)] bg-[var(--color-panel)] p-4">
+                <p className="font-mono text-[0.66rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
+                  子系统模板
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedSubsystemTemplates.map((subsystemTemplate) => (
+                    <span
+                      key={subsystemTemplate}
+                      className="rounded-full border border-[var(--color-line)] px-3 py-1 text-sm text-[var(--color-muted-strong)]"
+                    >
+                      {subsystemTemplate}
+                    </span>
                   ))}
                 </div>
               </article>
