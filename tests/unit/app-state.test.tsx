@@ -24,3 +24,14 @@ test("app error offers a retry action", async () => {
 
   expect(reset).toHaveBeenCalledTimes(1);
 });
+
+test("app error shows the Next.js digest when it is available", () => {
+  const reset = vi.fn();
+  const error = Object.assign(new Error("load failed"), {
+    digest: "NEXT_DIGEST_123",
+  });
+
+  render(<AppError error={error} reset={reset} />);
+
+  expect(screen.getByText("NEXT_DIGEST_123")).toBeInTheDocument();
+});

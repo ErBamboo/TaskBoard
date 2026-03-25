@@ -25,6 +25,17 @@ export default function AppError({ error, reset }: AppErrorProperties) {
           {error.message || "未知错误"}
         </div>
 
+        {error.digest ? (
+          <div className="rounded-[1.2rem] border border-[var(--color-line)] bg-[rgba(255,255,255,0.68)] px-4 py-3 text-sm leading-7 text-[var(--color-muted-strong)]">
+            <p className="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
+              Error digest
+            </p>
+            <p className="mt-2 font-mono text-sm text-[var(--color-ink)]">
+              {error.digest}
+            </p>
+          </div>
+        ) : null}
+
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="font-mono text-[0.66rem] uppercase tracking-[0.18em] text-[var(--color-muted)]">
             检查网络、环境变量或数据库连接后再重试。

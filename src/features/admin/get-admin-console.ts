@@ -182,22 +182,46 @@ export const getAdminConsole = cache(
       ]);
 
     if (usersResult.error) {
+      console.error("[getAdminConsole] users query failed", {
+        code: usersResult.error.code,
+        details: usersResult.error.details,
+        hint: usersResult.error.hint,
+        message: usersResult.error.message,
+      });
       throw new Error(`Failed to load admin users: ${usersResult.error.message}`);
     }
 
     if (projectsResult.error) {
+      console.error("[getAdminConsole] projects query failed", {
+        code: projectsResult.error.code,
+        details: projectsResult.error.details,
+        hint: projectsResult.error.hint,
+        message: projectsResult.error.message,
+      });
       throw new Error(
         `Failed to load admin projects: ${projectsResult.error.message}`,
       );
     }
 
     if (subsystemsResult.error) {
+      console.error("[getAdminConsole] subsystems query failed", {
+        code: subsystemsResult.error.code,
+        details: subsystemsResult.error.details,
+        hint: subsystemsResult.error.hint,
+        message: subsystemsResult.error.message,
+      });
       throw new Error(
         `Failed to load admin subsystems: ${subsystemsResult.error.message}`,
       );
     }
 
     if (milestonesResult.error) {
+      console.error("[getAdminConsole] milestones query failed", {
+        code: milestonesResult.error.code,
+        details: milestonesResult.error.details,
+        hint: milestonesResult.error.hint,
+        message: milestonesResult.error.message,
+      });
       throw new Error(
         `Failed to load admin milestones: ${milestonesResult.error.message}`,
       );

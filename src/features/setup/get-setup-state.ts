@@ -31,12 +31,24 @@ export const getSetupState = cache(async (): Promise<SetupStateResponse> => {
   ]);
 
   if (teamSettingsResult.error) {
+    console.error("[getSetupState] team_settings query failed", {
+      code: teamSettingsResult.error.code,
+      details: teamSettingsResult.error.details,
+      hint: teamSettingsResult.error.hint,
+      message: teamSettingsResult.error.message,
+    });
     throw new Error(
       `Failed to load team settings: ${teamSettingsResult.error.message}`,
     );
   }
 
   if (projectsResult.error) {
+    console.error("[getSetupState] projects query failed", {
+      code: projectsResult.error.code,
+      details: projectsResult.error.details,
+      hint: projectsResult.error.hint,
+      message: projectsResult.error.message,
+    });
     throw new Error(`Failed to load setup state: ${projectsResult.error.message}`);
   }
 
