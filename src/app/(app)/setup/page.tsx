@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { SetupWizard } from "@/components/setup/setup-wizard";
+import { resolveSetupPageMode } from "@/features/setup/setup-routing";
 import { getSessionUser } from "@/lib/auth/get-session-user";
 import { getSetupState } from "@/features/setup/get-setup-state";
 
@@ -10,12 +12,72 @@ export default async function SetupPage() {
     getSetupState(),
   ]);
 
-  if (!sessionUser || sessionUser.role !== "admin") {
+  const setupPageMode = resolveSetupPageMode({
+    role: sessionUser?.role ?? null,
+    isInitialized: setupState.isInitialized,
+  });
+
+  if (setupPageMode === "redirect") {
     redirect("/my-tasks");
   }
 
-  if (setupState.isInitialized) {
-    redirect("/admin");
+  if (setupPageMode === "completed") {
+    return (
+      <main className="grid gap-8">
+        <section className="grid gap-6 rounded-[2rem] border border-[var(--color-line-strong)] bg-[radial-gradient(circle_at_top_left,_rgba(16,104,117,0.12),_transparent_28%),linear-gradient(180deg,_rgba(249,246,239,0.96),_rgba(241,236,226,0.94))] p-6 shadow-[8px_8px_0_var(--color-shadow)] lg:grid-cols-[1.12fr_0.88fr]">
+          <div className="space-y-5">
+            <p className="font-mono text-[0.72rem] uppercase tracking-[0.35em] text-[#106875]">
+              Workspace ready
+            </p>
+            <h1 className="font-['Arial_Narrow','Helvetica_Neue_Condensed','Bahnschrift','sans-serif'] text-4xl uppercase tracking-[0.1em] text-[var(--color-ink)] lg:text-5xl">
+              工作区已初始化
+            </h1>
+            <p className="max-w-3xl text-base leading-8 text-[var(--color-muted-strong)]">
+              初始化已经完成。后续如需调整项目、子系统或里程碑，请进入管理台维护；普通成员安装客户端并登录后即可直接使用。
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <article className="rounded-[1.35rem] border border-[rgba(16,104,117,0.22)] bg-[rgba(16,104,117,0.08)] p-4">
+              <p className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
+                Team
+              </p>
+              <p className="mt-3 text-lg font-semibold text-[var(--color-ink)]">
+                {setupState.teamSettings?.teamName ?? "未设置"}
+              </p>
+            </article>
+            <article className="rounded-[1.35rem] border border-[rgba(16,104,117,0.22)] bg-[rgba(16,104,117,0.08)] p-4">
+              <p className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
+                Season
+              </p>
+              <p className="mt-3 text-lg font-semibold text-[var(--color-ink)]">
+                {setupState.teamSettings?.seasonName ?? "未设置"}
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section className="grid gap-4 rounded-[1.5rem] border border-[var(--color-line)] bg-[rgba(255,255,255,0.72)] p-5">
+          <p className="font-mono text-[0.66rem] uppercase tracking-[0.24em] text-[var(--color-accent)]">
+            Next actions
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/admin"
+              className="rounded-[1rem] border border-[var(--color-line-strong)] bg-[var(--color-ink)] px-5 py-3 font-mono text-[0.72rem] uppercase tracking-[0.2em] text-[var(--color-panel)]"
+            >
+              进入管理台
+            </Link>
+            <Link
+              href="/my-tasks"
+              className="rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-5 py-3 font-mono text-[0.72rem] uppercase tracking-[0.2em] text-[var(--color-muted-strong)]"
+            >
+              进入我的任务
+            </Link>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   return (

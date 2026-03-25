@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   resolvePostSignInPath,
+  resolveSetupPageMode,
   shouldRedirectAdminToSetup,
 } from "@/features/setup/setup-routing";
 
@@ -55,5 +56,32 @@ describe("setup routing", () => {
         isInitialized: false,
       }),
     ).toBe(false);
+  });
+
+  it("renders a completion page for initialized admins instead of forcing another redirect", () => {
+    expect(
+      resolveSetupPageMode({
+        role: "admin",
+        isInitialized: true,
+      }),
+    ).toBe("completed");
+  });
+
+  it("keeps uninitialized admins in the setup wizard", () => {
+    expect(
+      resolveSetupPageMode({
+        role: "admin",
+        isInitialized: false,
+      }),
+    ).toBe("wizard");
+  });
+
+  it("redirects non-admin users away from setup", () => {
+    expect(
+      resolveSetupPageMode({
+        role: "member",
+        isInitialized: false,
+      }),
+    ).toBe("redirect");
   });
 });
