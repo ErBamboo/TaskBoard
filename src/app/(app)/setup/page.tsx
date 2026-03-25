@@ -7,19 +7,18 @@ import { getSessionUser } from "@/lib/auth/get-session-user";
 import { getSetupState } from "@/features/setup/get-setup-state";
 
 export default async function SetupPage() {
-  const [sessionUser, setupState] = await Promise.all([
-    getSessionUser(),
-    getSetupState(),
-  ]);
+  const sessionUser = await getSessionUser();
 
-  const setupPageMode = resolveSetupPageMode({
-    role: sessionUser?.role ?? null,
-    isInitialized: setupState.isInitialized,
-  });
-
-  if (setupPageMode === "redirect") {
+  if (!sessionUser || sessionUser.role !== "admin") {
     redirect("/my-tasks");
   }
+
+  const setupState = await getSetupState();
+
+  const setupPageMode = resolveSetupPageMode({
+    role: sessionUser.role,
+    isInitialized: setupState.isInitialized,
+  });
 
   if (setupPageMode === "completed") {
     return (
