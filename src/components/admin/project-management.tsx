@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useActionState, useEffect, useRef } from "react";
 
 import { AdminActionFeedback, AdminSectionShell, AdminSubmitButton } from "@/components/admin/admin-primitives";
-import { upsertProjectAction, initialAdminActionState } from "@/features/admin/actions";
+import { upsertProjectAction } from "@/features/admin/actions";
+import { initialAdminActionState } from "@/features/admin/admin-form-schema";
 import { buildAdminUrl } from "@/features/admin/admin-url";
 import type { ProjectStatus } from "@/types/database";
 

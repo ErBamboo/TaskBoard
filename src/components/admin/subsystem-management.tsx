@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useActionState, useEffect, useRef } from "react";
 
 import { AdminActionFeedback, AdminSectionShell, AdminSubmitButton } from "@/components/admin/admin-primitives";
-import { initialAdminActionState, upsertSubsystemAction } from "@/features/admin/actions";
+import { upsertSubsystemAction } from "@/features/admin/actions";
+import { initialAdminActionState } from "@/features/admin/admin-form-schema";
 import { buildAdminUrl } from "@/features/admin/admin-url";
 
 type SubsystemEditor = {

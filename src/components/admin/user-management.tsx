@@ -4,11 +4,11 @@ import { useActionState, useEffect, useRef } from "react";
 
 import {
   createMemberAction,
-  initialAdminActionState,
   resetUserPasswordAction,
   toggleUserActiveAction,
 } from "@/features/admin/actions";
 import { AdminActionFeedback, AdminSectionShell, AdminSubmitButton } from "@/components/admin/admin-primitives";
+import { initialAdminActionState } from "@/features/admin/admin-form-schema";
 import type { UserRole } from "@/types/database";
 
 type ManagedUser = {

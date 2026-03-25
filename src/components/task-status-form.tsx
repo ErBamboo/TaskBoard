@@ -3,11 +3,11 @@
 import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 
+import { updateTaskStatusAction } from "@/features/tasks/actions";
 import {
   initialTaskActionState,
-  updateTaskStatusAction,
-} from "@/features/tasks/actions";
-import { taskStatusOptions } from "@/features/tasks/task-form-schema";
+  taskStatusOptions,
+} from "@/features/tasks/task-form-schema";
 import type { TaskStatus } from "@/types/database";
 
 type TaskStatusFormProperties = {

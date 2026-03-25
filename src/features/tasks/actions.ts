@@ -7,7 +7,6 @@ import { canManageProjects, canMutateTask } from "@/lib/permissions";
 import { getSessionUser } from "@/lib/auth/get-session-user";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
 import {
-  initialTaskActionState,
   parseTaskFormData,
   parseTaskStatusFormData,
   type TaskActionState,
@@ -322,5 +321,3 @@ export async function updateTaskStatusAction(
     message: "任务状态已更新。",
   };
 }
-
-export { initialTaskActionState };

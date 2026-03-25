@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { ZodError } from "zod";
 
 import {
-  initialAdminActionState,
   parseCreateMemberFormData,
   parseMilestoneFormData,
   parseProjectFormData,
@@ -516,5 +515,3 @@ export async function toggleUserActiveAction(
       : "成员账号已停用。",
   };
 }
-
-export { initialAdminActionState };

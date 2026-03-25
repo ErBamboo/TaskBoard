@@ -11,7 +11,6 @@ import { getAdminSupabaseClient } from "@/lib/supabase/admin";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
 import { getSetupState } from "@/features/setup/get-setup-state";
 import {
-  initialSetupActionState,
   parseSetupWizardFormData,
   type SetupActionState,
 } from "@/features/setup/setup-schema";
@@ -283,5 +282,3 @@ export async function initializeWorkspaceAction(
     throw error;
   }
 }
-
-export { initialSetupActionState };
