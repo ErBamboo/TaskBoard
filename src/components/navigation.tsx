@@ -1,9 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import type { UserRole } from "@/lib/permissions";
 
 type NavigationProperties = {
-  currentPath: string;
   role: UserRole;
 };
 
@@ -35,27 +37,31 @@ function isCurrentLink(currentPath: string, href: string) {
   return currentPath === href || currentPath.startsWith(`${href}/`);
 }
 
-export function Navigation({ currentPath, role }: NavigationProperties) {
+export function Navigation({ role }: NavigationProperties) {
+  const pathname = usePathname();
   const navigationItems =
     role === "admin" ? adminNavigationItems : memberNavigationItems;
 
   return (
-    <nav className="flex flex-wrap items-center gap-2">
+    <nav className="flex flex-wrap items-center gap-3">
       {navigationItems.map((navigationItem) => {
-        const isActive = isCurrentLink(currentPath, navigationItem.href);
+        const isActive = isCurrentLink(pathname, navigationItem.href);
 
         return (
           <Link
             key={navigationItem.href}
             href={navigationItem.href}
             className={[
-              "rounded-full border px-4 py-2 text-sm uppercase tracking-[0.18em] transition-colors duration-200",
+              "relative rounded-full px-5 py-2.5 font-mono text-[0.72rem] uppercase tracking-[0.24em] transition-all duration-300",
               isActive
-                ? "border-[var(--color-line-strong)] bg-[var(--color-ink)] text-[var(--color-panel)]"
-                : "border-[var(--color-line)] bg-[rgba(255,255,255,0.55)] text-[var(--color-muted-strong)] hover:border-[var(--color-line-strong)] hover:bg-[var(--color-panel)]",
+                ? "scale-[1.02] bg-[var(--color-ink)] text-[var(--color-panel)] shadow-[0_8px_16px_-6px_var(--color-ink)]"
+                : "bg-transparent text-[var(--color-muted-strong)] hover:bg-[rgba(31,36,38,0.06)] hover:text-[var(--color-ink)] hover:translate-y-[-1px]",
             ].join(" ")}
           >
             {navigationItem.label}
+            {isActive && (
+              <span className="absolute -bottom-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-[var(--color-accent)] shadow-[0_0_8px_var(--color-accent)]" />
+            )}
           </Link>
         );
       })}
