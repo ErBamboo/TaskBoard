@@ -40,6 +40,7 @@ export type ProjectBoardFilters = {
 export type ProjectBoardTaskGroups = Record<TaskStatus, ProjectBoardTask[]>;
 
 export type ProjectBoardResponse = {
+  allTasks: ProjectBoardTask[];
   assignees: Array<{
     id: string;
     name: string;
@@ -120,6 +121,7 @@ function buildEmptyProjectBoardResponse(
   filters: ProjectBoardFilters,
 ): ProjectBoardResponse {
   return {
+    allTasks: [],
     assignees: [],
     blockedTaskCount: 0,
     filters,
@@ -353,6 +355,7 @@ export const getProjectBoard = cache(
         startDate: project.start_date,
         targetDate: project.target_date,
       },
+      allTasks: projectBoardTasks,
       milestones,
       filters,
       assignees,

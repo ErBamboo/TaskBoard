@@ -9,6 +9,7 @@ import { ProjectTaskBoard } from "@/components/project-task-board";
 import { TaskEditorForm } from "@/components/task-editor-form";
 import { getProjectTaskEditor } from "@/features/tasks/get-project-task-editor";
 import { TaskEditorController } from "@/components/task-editor-controller";
+import { SubsystemTopology } from "@/components/subsystem-topology";
 import Link from "next/link";
 
 type ProjectBoardPageProperties = {
@@ -72,6 +73,11 @@ export default async function ProjectBoardPage({
           录入新任务
         </Link>
       </div>
+
+      <SubsystemTopology
+        subsystems={board.subsystems}
+        tasks={board.allTasks}
+      />
 
       <ProjectFilters
         projectId={projectId}
