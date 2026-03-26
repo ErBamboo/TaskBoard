@@ -75,7 +75,7 @@ export default async function AdminPage({ searchParams }: AdminPageProperties) {
         </div>
       </section>
 
-      <section className="grid gap-8 2xl:grid-cols-[0.92fr_1.08fr]">
+      <section className="grid gap-10 xl:grid-cols-[0.95fr_1.05fr]">
         <UserManagement users={adminConsole.users} />
         <ProjectManagement
           editor={adminConsole.projectEditor}
@@ -84,7 +84,7 @@ export default async function AdminPage({ searchParams }: AdminPageProperties) {
         />
       </section>
 
-      <section className="grid gap-8 2xl:grid-cols-2">
+      <section className="grid gap-10 xl:grid-cols-2">
         <SubsystemManagement
           editor={adminConsole.subsystemEditor}
           projects={adminConsole.projects.map((project) => ({

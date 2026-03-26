@@ -49,13 +49,13 @@ function SubsystemCard({
   subsystem: ManagedSubsystem;
 }) {
   return (
-    <article className="grid gap-3 rounded-[1.25rem] border border-[var(--color-line)] bg-[rgba(255,255,255,0.68)] p-4">
+    <article className="group grid gap-4 rounded-[1.35rem] border border-[var(--color-line)] bg-[rgba(255,255,255,0.68)] p-5 transition-all duration-300 hover:border-[var(--color-accent)] hover:bg-white hover:shadow-[0_12px_24px_-8px_var(--color-shadow)]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
             {subsystem.projectName}
           </p>
-          <h3 className="mt-2 text-base font-semibold tracking-[0.04em] text-[var(--color-ink)]">
+          <h3 className="mt-2 text-lg font-semibold tracking-[0.04em] text-[var(--color-ink)]">
             {subsystem.name}
           </h3>
         </div>
@@ -65,23 +65,25 @@ function SubsystemCard({
             scopeProjectId: scopeProjectId ?? subsystem.projectId,
             editSubsystemId: subsystem.id,
           })}
-          className="rounded-full border border-[var(--color-line)] px-3 py-2 font-mono text-[0.66rem] uppercase tracking-[0.18em] text-[var(--color-muted-strong)] transition-colors duration-200 hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+          className="rounded-full border border-[var(--color-line)] px-4 py-2 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-[var(--color-muted-strong)] transition-all duration-200 hover:bg-[var(--color-ink)] hover:text-white"
         >
-          编辑子系统
+          编辑
         </Link>
       </div>
 
-      <p className="text-sm leading-7 text-[var(--color-muted-strong)]">
+      <p className="text-sm leading-8 text-[var(--color-muted-strong)] opacity-85 group-hover:opacity-100">
         {subsystem.description || "暂无子系统描述。"}
       </p>
 
-      <div className="rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-3 py-2">
-        <p className="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
-          排序
-        </p>
-        <p className="mt-2 text-lg font-semibold text-[var(--color-ink)]">
-          {subsystem.sortOrder}
-        </p>
+      <div className="flex items-center justify-between border-t border-[var(--color-line)] pt-4">
+        <div className="flex items-center gap-3">
+          <p className="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
+            排序序列
+          </p>
+          <span className="rounded-md bg-[var(--color-panel)] px-3 py-1 text-sm font-semibold text-[var(--color-ink)]">
+            {subsystem.sortOrder}
+          </span>
+        </div>
       </div>
     </article>
   );
@@ -148,8 +150,8 @@ export function SubsystemManagement({
           ) : null}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-[1.1fr_1fr_0.6fr]">
-          <label className="grid gap-2">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <label className="grid gap-2 lg:col-span-1">
             <span className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
               所属项目
             </span>
@@ -157,7 +159,7 @@ export function SubsystemManagement({
               name="projectId"
               required
               defaultValue={editor.defaults.projectId}
-              className="rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-4 py-3 text-sm text-[var(--color-ink)] outline-none transition-colors duration-200 focus:border-[var(--color-accent)]"
+              className="w-full rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-4 py-3 text-sm text-[var(--color-ink)] outline-none transition-all duration-200 focus:border-[var(--color-accent)] focus:bg-white"
             >
               <option value="">选择项目</option>
               {projects.map((project) => (
@@ -168,7 +170,7 @@ export function SubsystemManagement({
             </select>
           </label>
 
-          <label className="grid gap-2">
+          <label className="grid gap-2 lg:col-span-1">
             <span className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
               子系统名称
             </span>
@@ -177,14 +179,14 @@ export function SubsystemManagement({
               name="name"
               required
               defaultValue={editor.defaults.name}
-              className="rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-4 py-3 text-sm text-[var(--color-ink)] outline-none transition-colors duration-200 focus:border-[var(--color-accent)]"
+              className="w-full rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-4 py-3 text-sm text-[var(--color-ink)] outline-none transition-all duration-200 focus:border-[var(--color-accent)] focus:bg-white"
               placeholder="例如：Vision"
             />
           </label>
 
-          <label className="grid gap-2">
+          <label className="grid gap-2 sm:col-span-2 lg:col-span-1">
             <span className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
-              排序
+              排序权重
             </span>
             <input
               type="number"
@@ -192,7 +194,7 @@ export function SubsystemManagement({
               min={0}
               required
               defaultValue={editor.defaults.sortOrder}
-              className="rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-4 py-3 text-sm text-[var(--color-ink)] outline-none transition-colors duration-200 focus:border-[var(--color-accent)]"
+              className="w-full rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-4 py-3 text-sm text-[var(--color-ink)] outline-none transition-all duration-200 focus:border-[var(--color-accent)] focus:bg-white"
             />
           </label>
         </div>

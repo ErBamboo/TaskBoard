@@ -239,7 +239,7 @@ export const getProjectBoard = cache(
           is_integration_task,
           due_at,
           subsystem:subsystems(id, name),
-          assignee:user_profiles(id, display_name),
+          assignee:user_profiles!tasks_assignee_id_fkey(id, display_name),
           milestone:milestones(name)
         `,
       )

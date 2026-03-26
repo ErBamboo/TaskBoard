@@ -65,20 +65,22 @@ export function AdminSectionShell({
   title,
 }: AdminSectionShellProperties) {
   return (
-    <section className="grid gap-5 rounded-[1.85rem] border border-[var(--color-line-strong)] bg-[linear-gradient(180deg,_rgba(249,246,239,0.96),_rgba(241,236,226,0.94))] p-5 shadow-[8px_8px_0_var(--color-shadow)]">
-      <div className="space-y-2">
-        <p className="font-mono text-[0.68rem] uppercase tracking-[0.3em] text-[var(--color-accent)]">
+    <section className="flex flex-col gap-6 rounded-[2rem] border border-[var(--color-line-strong)] bg-[linear-gradient(180deg,_rgba(249,246,239,0.98),_rgba(241,236,226,0.96))] p-6 shadow-[0_8px_32px_-12px_var(--color-shadow),_0_0_0_1px_rgba(255,255,255,0.4)_inset]">
+      <div className="space-y-3">
+        <p className="font-mono text-[0.7rem] uppercase tracking-[0.35em] text-[var(--color-accent)]">
           {eyebrow}
         </p>
-        <h2 className="font-['Arial_Narrow','Helvetica_Neue_Condensed','Bahnschrift','sans-serif'] text-3xl uppercase tracking-[0.08em] text-[var(--color-ink)]">
+        <h2 className="font-['Arial_Narrow','Helvetica_Neue_Condensed','Bahnschrift','sans-serif'] text-3xl uppercase tracking-[0.1em] text-[var(--color-ink)] lg:text-4xl">
           {title}
         </h2>
-        <p className="max-w-3xl text-sm leading-7 text-[var(--color-muted-strong)]">
+        <p className="max-w-3xl text-sm leading-8 text-[var(--color-muted-strong)] opacity-90">
           {description}
         </p>
       </div>
 
-      {children}
+      <div className="grid gap-6">
+        {children}
+      </div>
     </section>
   );
 }

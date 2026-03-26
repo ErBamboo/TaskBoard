@@ -64,19 +64,19 @@ function MilestoneCard({
   scopeProjectId: string | null;
 }) {
   return (
-    <article className="grid gap-3 rounded-[1.25rem] border border-[var(--color-line)] bg-[rgba(255,255,255,0.68)] p-4">
+    <article className="group grid gap-4 rounded-[1.35rem] border border-[var(--color-line)] bg-[rgba(255,255,255,0.68)] p-5 transition-all duration-300 hover:border-[var(--color-accent)] hover:bg-white hover:shadow-[0_12px_24px_-8px_var(--color-shadow)]">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+        <div className="space-y-1">
           <p className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
             {milestone.projectName}
           </p>
-          <h3 className="mt-2 text-base font-semibold tracking-[0.04em] text-[var(--color-ink)]">
+          <h3 className="text-lg font-semibold tracking-[0.04em] text-[var(--color-ink)]">
             {milestone.name}
           </h3>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <span className="rounded-full border border-[var(--color-line)] px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-[var(--color-muted-strong)]">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="rounded-full bg-[var(--color-panel)] px-3 py-1 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-[var(--color-muted-strong)] border border-[var(--color-line)]">
             {milestoneStatusLabelMap[milestone.status]}
           </span>
           <Link
@@ -84,24 +84,26 @@ function MilestoneCard({
               scopeProjectId: scopeProjectId ?? milestone.projectId,
               editMilestoneId: milestone.id,
             })}
-            className="rounded-full border border-[var(--color-line)] px-3 py-2 font-mono text-[0.66rem] uppercase tracking-[0.18em] text-[var(--color-muted-strong)] transition-colors duration-200 hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+            className="rounded-full border border-[var(--color-line)] px-4 py-2 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-[var(--color-muted-strong)] transition-all duration-200 hover:bg-[var(--color-ink)] hover:text-white"
           >
-            编辑里程碑
+            编辑
           </Link>
         </div>
       </div>
 
-      <p className="text-sm leading-7 text-[var(--color-muted-strong)]">
+      <p className="text-sm leading-8 text-[var(--color-muted-strong)] opacity-85 group-hover:opacity-100">
         {milestone.description || "暂无里程碑描述。"}
       </p>
 
-      <div className="rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-3 py-2">
-        <p className="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
-          目标日期
-        </p>
-        <p className="mt-2 text-sm text-[var(--color-muted-strong)]">
-          {milestone.dueDate ?? "未设置"}
-        </p>
+      <div className="flex items-center justify-between border-t border-[var(--color-line)] pt-4">
+        <div className="flex items-center gap-3">
+          <p className="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
+            目标日期
+          </p>
+          <span className="text-sm font-semibold text-[var(--color-ink)]">
+            {milestone.dueDate ?? "未设置"}
+          </span>
+        </div>
       </div>
     </article>
   );
@@ -168,8 +170,8 @@ export function MilestoneManagement({
           ) : null}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-[1.1fr_1fr_0.8fr]">
-          <label className="grid gap-2">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <label className="grid gap-2 lg:col-span-1">
             <span className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
               所属项目
             </span>
@@ -177,7 +179,7 @@ export function MilestoneManagement({
               name="projectId"
               required
               defaultValue={editor.defaults.projectId}
-              className="rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-4 py-3 text-sm text-[var(--color-ink)] outline-none transition-colors duration-200 focus:border-[var(--color-accent)]"
+              className="w-full rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-4 py-3 text-sm text-[var(--color-ink)] outline-none transition-all duration-200 focus:border-[var(--color-accent)] focus:bg-white"
             >
               <option value="">选择项目</option>
               {projects.map((project) => (
@@ -188,7 +190,7 @@ export function MilestoneManagement({
             </select>
           </label>
 
-          <label className="grid gap-2">
+          <label className="grid gap-2 lg:col-span-1">
             <span className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
               里程碑名称
             </span>
@@ -197,19 +199,19 @@ export function MilestoneManagement({
               name="name"
               required
               defaultValue={editor.defaults.name}
-              className="rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-4 py-3 text-sm text-[var(--color-ink)] outline-none transition-colors duration-200 focus:border-[var(--color-accent)]"
+              className="w-full rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-4 py-3 text-sm text-[var(--color-ink)] outline-none transition-all duration-200 focus:border-[var(--color-accent)] focus:bg-white"
               placeholder="例如：First Integration"
             />
           </label>
 
-          <label className="grid gap-2">
+          <label className="grid gap-2 sm:col-span-2 lg:col-span-1">
             <span className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
-              状态
+              当前状态
             </span>
             <select
               name="status"
               defaultValue={editor.defaults.status}
-              className="rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-4 py-3 text-sm text-[var(--color-ink)] outline-none transition-colors duration-200 focus:border-[var(--color-accent)]"
+              className="w-full rounded-[1rem] border border-[var(--color-line)] bg-[var(--color-panel)] px-4 py-3 text-sm text-[var(--color-ink)] outline-none transition-all duration-200 focus:border-[var(--color-accent)] focus:bg-white"
             >
               {milestoneStatusOptions.map((milestoneStatusOption) => (
                 <option
