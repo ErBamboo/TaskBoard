@@ -21,72 +21,86 @@ function ProjectTaskCard({
   return (
     <article
       className={[
-        "grid gap-3 rounded-[1.25rem] border bg-[rgba(255,255,255,0.72)] p-4 shadow-[4px_4px_0_var(--color-shadow)]",
+        "group relative flex flex-col gap-4 rounded-[1.25rem] border bg-white/70 p-5 transition-all duration-300 hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
         task.status === "blocked"
-          ? "border-[rgba(204,75,27,0.26)]"
+          ? "border-[rgba(204,75,27,0.2)] bg-[rgba(204,75,27,0.02)]"
           : "border-[var(--color-line)]",
       ].join(" ")}
     >
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
-            {task.subsystemName} / {task.assigneeName}
-          </p>
-          <h3 className="mt-2 text-sm font-semibold leading-6 text-[var(--color-ink)]">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[0.6rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
+              {task.subsystemName}
+            </span>
+            <span className="h-1 w-1 rounded-full bg-[var(--color-line-strong)]" />
+            <span className="font-mono text-[0.6rem] uppercase tracking-[0.2em] text-[var(--color-accent)]">
+              {task.assigneeName}
+            </span>
+          </div>
+          <h3 className="text-[0.92rem] font-semibold leading-relaxed tracking-tight text-[var(--color-ink)] group-hover:text-[var(--color-accent)] transition-colors">
             {task.title}
           </h3>
         </div>
-        {task.isIntegrationTask ? (
-          <span className="rounded-full border border-[rgba(16,104,117,0.18)] bg-[rgba(16,104,117,0.08)] px-2.5 py-1 font-mono text-[0.65rem] uppercase tracking-[0.18em] text-[#106875]">
-            联调
-          </span>
-        ) : null}
-      </div>
-
-      <div className="grid gap-2 text-sm leading-6 text-[var(--color-muted-strong)]">
-        <p>优先级：{task.priority}</p>
-        <p>里程碑：{task.milestoneName ?? "未关联"}</p>
-        <p>截止：{task.dueAt ? new Date(task.dueAt).toLocaleString("zh-CN") : "未设置"}</p>
-        {task.status === "blocked" && task.blockedReason ? (
-          <p className="rounded-xl border border-[rgba(204,75,27,0.18)] bg-[rgba(204,75,27,0.08)] px-3 py-2 text-[var(--color-accent)]">
-            {task.blockedReason}
-          </p>
-        ) : null}
-      </div>
-
-      {task.canEdit || task.canUpdateStatus ? (
-        <div className="grid gap-3 border-t border-[var(--color-line)] pt-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            {task.canEdit ? (
-              <Link
-                href={`/projects/${projectId}?editTaskId=${task.id}`}
-                className="font-mono text-[0.68rem] uppercase tracking-[0.18em] text-[var(--color-accent)] transition-colors duration-200 hover:text-[var(--color-ink)]"
-              >
-                编辑任务
-              </Link>
-            ) : (
-              <span className="font-mono text-[0.68rem] uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                只读查看
-              </span>
-            )}
-
-            {task.canUpdateStatus ? (
-              <details className="group">
-                <summary className="cursor-pointer list-none font-mono text-[0.68rem] uppercase tracking-[0.18em] text-[var(--color-muted-strong)]">
-                  状态流转
-                </summary>
-                <div className="mt-3">
-                  <TaskStatusForm
-                    blockedReason={task.blockedReason}
-                    currentStatus={task.status}
-                    taskId={task.id}
-                  />
-                </div>
-              </details>
-            ) : null}
+        {task.isIntegrationTask && (
+          <div className="flex h-6 items-center rounded-md border border-[rgba(16,104,117,0.2)] bg-[rgba(16,104,117,0.05)] px-2 font-mono text-[0.55rem] font-bold uppercase tracking-[0.1em] text-[#106875]">
+            INTG
           </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.7rem] text-[var(--color-muted-strong)]">
+        <div className="flex items-center gap-1.5">
+          <span className="font-mono opacity-60">PRIO:</span>
+          <span className="font-semibold uppercase tracking-wider">{task.priority}</span>
         </div>
-      ) : null}
+        {task.dueAt && (
+          <div className="flex items-center gap-1.5">
+            <span className="font-mono opacity-60">DUE:</span>
+            <span className="font-semibold">
+              {new Date(task.dueAt).toLocaleDateString("zh-CN", { month: "short", day: "numeric" })}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {task.status === "blocked" && task.blockedReason && (
+        <div className="rounded-lg border border-[rgba(204,75,27,0.15)] bg-[rgba(204,75,27,0.05)] p-3 text-[0.75rem] leading-6 text-[var(--color-accent)]">
+          <span className="mr-1 font-bold">BLOCKED:</span> {task.blockedReason}
+        </div>
+      )}
+
+      {(task.canEdit || task.canUpdateStatus) && (
+        <div className="mt-2 flex items-center justify-between border-t border-[var(--color-line)] pt-4 opacity-0 transition-opacity group-hover:opacity-100">
+          {task.canEdit ? (
+            <Link
+              href={`/projects/${projectId}?editTaskId=${task.id}`}
+              className="font-mono text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[var(--color-ink)] hover:text-[var(--color-accent)]"
+            >
+              Details & Edit
+            </Link>
+          ) : (
+            <span className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
+              View Only
+            </span>
+          )}
+
+          {task.canUpdateStatus && (
+            <details className="group/status relative">
+              <summary className="cursor-pointer list-none font-mono text-[0.65rem] uppercase tracking-[0.2em] text-[var(--color-muted-strong)] hover:text-[var(--color-ink)]">
+                Move Status
+              </summary>
+              <div className="absolute bottom-full right-0 z-10 mb-2 w-48 rounded-xl border border-[var(--color-line-strong)] bg-white p-2 shadow-xl backdrop-blur-md">
+                <TaskStatusForm
+                  blockedReason={task.blockedReason}
+                  currentStatus={task.status}
+                  taskId={task.id}
+                />
+              </div>
+            </details>
+          )}
+        </div>
+      )}
     </article>
   );
 }
@@ -103,29 +117,37 @@ function ProjectTaskColumn({
   tasks: ProjectBoardTask[];
 }) {
   return (
-    <section className="grid gap-4 rounded-[1.7rem] border border-[var(--color-line-strong)] bg-[rgba(246,242,232,0.92)] p-5">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="font-mono text-[0.65rem] uppercase tracking-[0.26em] text-[var(--color-muted)]">
-            {status}
-          </p>
-          <h2 className="mt-2 text-lg font-semibold tracking-[0.04em] text-[var(--color-ink)]">
+    <section className="flex flex-col gap-5 rounded-[2rem] border border-transparent bg-[rgba(31,36,38,0.03)] p-6 transition-colors hover:bg-[rgba(31,36,38,0.05)]">
+      <div className="flex items-center justify-between px-1">
+        <div className="flex items-center gap-3">
+          <h2 className="font-['Arial_Narrow','Helvetica_Neue_Condensed','Bahnschrift','sans-serif'] text-xl uppercase tracking-[0.12em] text-[var(--color-ink)]">
             {label}
           </h2>
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-ink)] font-mono text-[0.6rem] text-white">
+            {tasks.length}
+          </span>
         </div>
-        <span className="rounded-full border border-[var(--color-line)] px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-[var(--color-accent)]">
-          {tasks.length}
-        </span>
+        <Link
+          href={`/projects/${projectId}?new=true`}
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-line)] text-[var(--color-muted)] transition-all hover:bg-[var(--color-ink)] hover:text-white"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </Link>
       </div>
 
-      <div className="grid gap-4 [content-visibility:auto]">
+      <div className="flex flex-col gap-4">
         {tasks.length > 0 ? (
           tasks.map((task) => (
             <ProjectTaskCard key={task.id} projectId={projectId} task={task} />
           ))
         ) : (
-          <div className="rounded-[1.2rem] border border-dashed border-[var(--color-line)] px-4 py-6 text-sm leading-7 text-[var(--color-muted-strong)]">
-            当前列暂无任务。
+          <div className="flex flex-col items-center justify-center rounded-[1.5rem] border border-dashed border-[var(--color-line-strong)] py-12 text-center">
+            <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
+              No tasks active
+            </p>
           </div>
         )}
       </div>

@@ -11,6 +11,8 @@ import {
   isDesktopClientUserAgent,
 } from "@/lib/desktop/is-desktop-client";
 
+import { CommandBar } from "@/components/command-bar";
+
 type AppShellProperties = {
   children: ReactNode;
   signOutAction: () => Promise<void>;
@@ -33,6 +35,7 @@ export async function AppShell({
 
   return (
     <div className="min-h-screen">
+      <CommandBar />
       <div className="sticky top-0 z-50 border-b border-[var(--color-line-strong)] bg-[rgba(243,239,229,0.92)] shadow-[0_4px_24px_-12px_var(--color-shadow)] backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl flex-col gap-5 px-6 py-5 lg:px-10">
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
