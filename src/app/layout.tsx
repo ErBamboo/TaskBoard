@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
 import "./globals.css";
-import { PwaRegistration } from "@/components/pwa-registration";
 
 type RootLayoutProperties = {
   children: ReactNode;
@@ -15,15 +14,8 @@ export const metadata: Metadata = {
     template: "%s | Robot Task Board",
   },
   description: "Robot Task Board is a mission-driven online command surface for robotics competition teams.",
-  manifest: "/manifest.webmanifest",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Robot Task Board",
-  },
   icons: {
     icon: [{ url: "/icons/robot-task-board-192.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icons/robot-task-board-192.svg", type: "image/svg+xml" }],
   },
 };
 
@@ -51,7 +43,6 @@ export default function RootLayout({ children }: RootLayoutProperties) {
             </div>
           </div>
         </div>
-        <PwaRegistration />
         {children}
       </body>
     </html>

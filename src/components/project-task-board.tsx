@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState, useRef, useEffect } from "react";
 
 import { TaskStatusForm } from "@/components/task-status-form";
 import type {
@@ -18,6 +21,24 @@ function ProjectTaskCard({
   projectId: string;
   task: ProjectBoardTask;
 }) {
+  const [isStatusOpen, setIsStatusOpen] = useState(false);
+  const statusMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (statusMenuRef.current && !statusMenuRef.current.contains(event.target as Node)) {
+        setIsStatusOpen(false);
+      }
+    };
+
+    if (isStatusOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isStatusOpen]);
+
   return (
     <article
       className={[
@@ -86,18 +107,24 @@ function ProjectTaskCard({
           )}
 
           {task.canUpdateStatus && (
-            <details className="group/status relative">
-              <summary className="cursor-pointer list-none font-mono text-[0.65rem] uppercase tracking-[0.2em] text-[var(--color-muted-strong)] hover:text-[var(--color-ink)]">
-                Move Status
-              </summary>
-              <div className="absolute bottom-full right-0 z-10 mb-2 w-48 rounded-xl border border-[var(--color-line-strong)] bg-white p-2 shadow-xl backdrop-blur-md">
-                <TaskStatusForm
-                  blockedReason={task.blockedReason}
-                  currentStatus={task.status}
-                  taskId={task.id}
-                />
-              </div>
-            </details>
+            <div className="relative" ref={statusMenuRef}>
+              <button
+                onClick={() => setIsStatusOpen(!isStatusOpen)}
+                className="cursor-pointer font-mono text-[0.65rem] uppercase tracking-[0.2em] text-[var(--color-muted-strong)] hover:text-[var(--color-ink)]"
+              >
+                {isStatusOpen ? "Close Menu" : "Move Status"}
+              </button>
+              
+              {isStatusOpen && (
+                <div className="absolute bottom-full right-0 z-10 mb-2 w-48 rounded-xl border border-[var(--color-line-strong)] bg-white p-2 shadow-xl backdrop-blur-md animate-in fade-in slide-in-from-bottom-2">
+                  <TaskStatusForm
+                    blockedReason={task.blockedReason}
+                    currentStatus={task.status}
+                    taskId={task.id}
+                  />
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}

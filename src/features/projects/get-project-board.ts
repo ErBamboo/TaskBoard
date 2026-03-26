@@ -227,6 +227,12 @@ export const getProjectBoard = cache(
       .eq("project_id", projectId)
       .order("due_date", { ascending: true, nullsFirst: false });
 
+    const subsystemsPromise = supabaseClient
+      .from("subsystems")
+      .select("id, name, sort_order")
+      .eq("project_id", projectId)
+      .order("sort_order", { ascending: true });
+
     const tasksPromise = supabaseClient
       .from("tasks")
       .select(
@@ -248,9 +254,10 @@ export const getProjectBoard = cache(
       .eq("project_id", projectId)
       .order("due_at", { ascending: true, nullsFirst: false });
 
-    const [projectResult, milestonesResult, tasksResult] = await Promise.all([
+    const [projectResult, milestonesResult, subsystemsResult, tasksResult] = await Promise.all([
       projectPromise,
       milestonesPromise,
+      subsystemsPromise,
       tasksPromise,
     ]);
 
@@ -268,6 +275,12 @@ export const getProjectBoard = cache(
       );
     }
 
+    if (subsystemsResult.error) {
+      throw new Error(
+        `Failed to load project subsystems: ${subsystemsResult.error.message}`,
+      );
+    }
+
     if (tasksResult.error) {
       throw new Error(`Failed to load project tasks: ${tasksResult.error.message}`);
     }
@@ -281,6 +294,11 @@ export const getProjectBoard = cache(
         dueDate: rawProjectBoardMilestone.due_date,
       }),
     );
+
+    const subsystems = (subsystemsResult.data ?? []).map((s) => ({
+      id: s.id,
+      name: s.name,
+    }));
 
     const projectBoardTasks = ((tasksResult.data ?? []) as unknown as RawProjectBoardTask[]).map(
       (rawProjectBoardTask): ProjectBoardTask => {
@@ -333,17 +351,6 @@ export const getProjectBoard = cache(
       ).values(),
     ].toSorted((firstAssignee, secondAssignee) =>
       firstAssignee.name.localeCompare(secondAssignee.name, "zh-CN"),
-    );
-
-    const subsystems = [
-      ...new Map(
-        projectBoardTasks.map((task) => [
-          task.subsystemId,
-          { id: task.subsystemId, name: task.subsystemName },
-        ]),
-      ).values(),
-    ].toSorted((firstSubsystem, secondSubsystem) =>
-      firstSubsystem.name.localeCompare(secondSubsystem.name, "zh-CN"),
     );
 
     return {

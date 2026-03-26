@@ -5,7 +5,6 @@ import { headers } from "next/headers";
 import type { SessionUser } from "@/lib/auth/get-session-user";
 import { Navigation } from "@/components/navigation";
 import { DesktopShellHints } from "@/components/desktop/desktop-shell-hints";
-import { PwaInstallPrompt } from "@/components/pwa-install-prompt";
 import {
   getDesktopClientVersionFromUserAgent,
   isDesktopClientUserAgent,
@@ -74,10 +73,8 @@ export async function AppShell({
           </div>
 
           <Navigation role={user.role} />
-          {isDesktopClient ? (
+          {isDesktopClient && (
             <DesktopShellHints clientVersion={clientVersion} mode="app" />
-          ) : (
-            <PwaInstallPrompt variant="compact" />
           )}
         </div>
       </div>
