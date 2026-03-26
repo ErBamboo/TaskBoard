@@ -2,7 +2,7 @@ import {
   getProjectBoard,
   normalizeProjectBoardFilters,
 } from "@/features/projects/get-project-board";
-import { MissionEmptyState } from "@/mission-empty-state";
+import { MissionEmptyState } from "@/components/mission-empty-state";
 import { ProjectFilters } from "@/components/project-filters";
 import { ProjectOverview } from "@/components/project-overview";
 import { ProjectTaskBoard } from "@/components/project-task-board";
