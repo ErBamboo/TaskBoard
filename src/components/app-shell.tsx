@@ -25,8 +25,6 @@ export async function AppShell({
   user,
 }: AppShellProperties) {
   const headersStore = await headers();
-  const currentPath =
-    headersStore.get("x-current-path") ?? headersStore.get("x-invoke-path") ?? "/my-tasks";
   const userAgent = headersStore.get("user-agent");
   const isDesktopClient = isDesktopClientUserAgent(
     userAgent,

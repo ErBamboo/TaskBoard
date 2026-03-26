@@ -42,7 +42,6 @@ export default async function ProjectBoardPage({
     (await searchParams) ?? {};
   const filters = await normalizeProjectBoardFilters(resolvedSearchParams);
   const editTaskId = sanitizeSearchParamValue(resolvedSearchParams.editTaskId);
-  const isNew = resolvedSearchParams.new === "true";
 
   const [board, editor] = await Promise.all([
     getProjectBoard(projectId, filters),
@@ -98,8 +97,8 @@ export default async function ProjectBoardPage({
         )}
       </section>
 
-      <TaskEditorController isEditing={!!editTaskId || isNew}>
-        <TaskEditorForm editor={editor} projectId={projectId} />
+      <TaskEditorController>
+        <TaskEditorForm editor={editor} />
       </TaskEditorController>
     </main>
   );

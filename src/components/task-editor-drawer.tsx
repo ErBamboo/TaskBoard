@@ -1,8 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { ReactNode, useEffect, useSyncExternalStore } from "react";
 
 type TaskEditorDrawerProps = {
   children: ReactNode;
@@ -11,16 +9,23 @@ type TaskEditorDrawerProps = {
   title: string;
 };
 
+const emptySubscribe = () => () => {};
+
 export function TaskEditorDrawer({
   children,
   isOpen,
   onClose,
   title,
 }: TaskEditorDrawerProps) {
-  const [mounted, setMounted] = useState(false);
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
   useEffect(() => {
-    setMounted(true);
+    if (!isMounted) return;
+
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
@@ -29,9 +34,9 @@ export function TaskEditorDrawer({
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isOpen]);
+  }, [isOpen, isMounted]);
 
-  if (!mounted) return null;
+  if (!isMounted) return null;
 
   return (
     <>

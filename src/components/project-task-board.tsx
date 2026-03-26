@@ -108,12 +108,10 @@ function ProjectTaskCard({
 function ProjectTaskColumn({
   label,
   projectId,
-  status,
   tasks,
 }: {
   label: string;
   projectId: string;
-  status: keyof ProjectBoardTaskGroups;
   tasks: ProjectBoardTask[];
 }) {
   return (
@@ -173,7 +171,6 @@ export function ProjectTaskBoard({
           key={boardColumn.key}
           label={boardColumn.label}
           projectId={projectId}
-          status={boardColumn.key}
           tasks={groupedTasks[boardColumn.key]}
         />
       ))}

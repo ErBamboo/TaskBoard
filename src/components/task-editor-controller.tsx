@@ -6,12 +6,10 @@ import { TaskEditorDrawer } from "./task-editor-drawer";
 
 type TaskEditorControllerProps = {
   children: ReactNode;
-  isEditing: boolean;
 };
 
 export function TaskEditorController({
   children,
-  isEditing,
 }: TaskEditorControllerProps) {
   const router = useRouter();
   const searchParams = useSearchParams();

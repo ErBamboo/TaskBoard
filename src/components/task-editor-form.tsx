@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
@@ -16,13 +15,6 @@ import {
 } from "@/features/tasks/task-form-schema";
 import type { TaskRelationType, TaskStatus } from "@/types/database";
 
-type TaskEditorFormProperties = {
-  editor: ProjectTaskEditorResponse;
-  projectId: string;
-};
-
-type TaskEditorFormBodyProperties = TaskEditorFormProperties;
-
 function SubmitButton({ mode }: { mode: ProjectTaskEditorResponse["mode"] }) {
   const { pending } = useFormStatus();
 
@@ -37,26 +29,11 @@ function SubmitButton({ mode }: { mode: ProjectTaskEditorResponse["mode"] }) {
   );
 }
 
-function FieldLabel({
-  children,
-  htmlFor,
-}: {
-  children: string;
-  htmlFor: string;
-}) {
-  return (
-    <label className="grid gap-2" htmlFor={htmlFor}>
-      <span className="font-mono text-[0.65rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
-        {children}
-      </span>
-    </label>
-  );
-}
-
 function TaskEditorFormBody({
   editor,
-  projectId,
-}: TaskEditorFormBodyProperties) {
+}: {
+  editor: ProjectTaskEditorResponse;
+}) {
   const [taskActionState, taskFormAction] = useActionState(
     upsertTaskAction,
     initialTaskActionState,
@@ -351,8 +328,9 @@ function TaskEditorFormBody({
 
 export function TaskEditorForm({
   editor,
-  projectId,
-}: TaskEditorFormProperties) {
+}: {
+  editor: ProjectTaskEditorResponse;
+}) {
   const formInstanceKey = [
     editor.mode,
     editor.defaults.taskId || "new",
@@ -364,7 +342,6 @@ export function TaskEditorForm({
     <TaskEditorFormBody
       key={formInstanceKey}
       editor={editor}
-      projectId={projectId}
     />
   );
 }
