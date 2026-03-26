@@ -88,24 +88,24 @@ type RawProjectBoardMilestone = {
 
 type RawProjectBoardTask = {
   assignee_id: string;
-  assignee: Array<{
+  assignee: {
     display_name: string;
     id: string;
-  }> | null;
+  } | null;
   blocked_reason: string;
   creator_id: string;
   due_at: string | null;
   id: string;
   is_integration_task: boolean;
-  milestone: Array<{
+  milestone: {
     name: string;
-  }> | null;
+  } | null;
   priority: TaskPriority;
   status: TaskStatus;
-  subsystem: Array<{
+  subsystem: {
     id: string;
     name: string;
-  }> | null;
+  } | null;
   title: string;
 };
 
@@ -141,8 +141,10 @@ function buildEmptyProjectBoardResponse(
   };
 }
 
-function relationFirst<T>(relation: T[] | null | undefined, fallbackValue: T) {
-  return relation?.[0] ?? fallbackValue;
+function resolveRelation<T>(relation: T | T[] | null | undefined, fallbackValue: T): T {
+  if (!relation) return fallbackValue;
+  if (Array.isArray(relation)) return relation[0] ?? fallbackValue;
+  return relation;
 }
 
 function sanitizeFilterValue(filterValue: string | string[] | undefined) {
@@ -302,11 +304,11 @@ export const getProjectBoard = cache(
 
     const projectBoardTasks = ((tasksResult.data ?? []) as unknown as RawProjectBoardTask[]).map(
       (rawProjectBoardTask): ProjectBoardTask => {
-        const subsystem = relationFirst(rawProjectBoardTask.subsystem, {
+        const subsystem = resolveRelation(rawProjectBoardTask.subsystem, {
           id: "unknown",
           name: "未分配子系统",
         });
-        const assignee = relationFirst(rawProjectBoardTask.assignee, {
+        const assignee = resolveRelation(rawProjectBoardTask.assignee, {
           id: "unknown",
           display_name: "未指定负责人",
         });
@@ -335,7 +337,7 @@ export const getProjectBoard = cache(
           subsystemName: subsystem.name,
           assigneeId: assignee.id,
           assigneeName: assignee.display_name,
-          milestoneName: rawProjectBoardTask.milestone?.[0]?.name ?? null,
+          milestoneName: rawProjectBoardTask.milestone?.name ?? null,
         };
       },
     );

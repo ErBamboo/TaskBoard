@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 
 import { TaskStatusForm } from "@/components/task-status-form";
+import { deleteTaskAction } from "@/features/tasks/actions";
 import type {
   ProjectBoardTask,
   ProjectBoardTaskGroups,
@@ -22,6 +23,8 @@ function ProjectTaskCard({
   task: ProjectBoardTask;
 }) {
   const [isStatusOpen, setIsStatusOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const statusMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,6 +42,22 @@ function ProjectTaskCard({
     };
   }, [isStatusOpen]);
 
+  const handleDelete = async () => {
+    if (!isConfirmingDelete) {
+      setIsConfirmingDelete(true);
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await deleteTaskAction(projectId, task.id);
+    } catch (error) {
+      console.error("Delete failed:", error);
+      setIsDeleting(false);
+      setIsConfirmingDelete(false);
+    }
+  };
+
   return (
     <article
       className={[
@@ -46,6 +65,7 @@ function ProjectTaskCard({
         task.status === "blocked"
           ? "border-[rgba(204,75,27,0.2)] bg-[rgba(204,75,27,0.02)]"
           : "border-[var(--color-line)]",
+        isDeleting ? "opacity-50 grayscale pointer-events-none" : ""
       ].join(" ")}
     >
       <div className="flex items-start justify-between gap-3">
@@ -93,18 +113,31 @@ function ProjectTaskCard({
 
       {(task.canEdit || task.canUpdateStatus) && (
         <div className="mt-2 flex items-center justify-between border-t border-[var(--color-line)] pt-4 opacity-0 transition-opacity group-hover:opacity-100">
-          {task.canEdit ? (
-            <Link
-              href={`/projects/${projectId}?editTaskId=${task.id}`}
-              className="font-mono text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[var(--color-ink)] hover:text-[var(--color-accent)]"
-            >
-              Details & Edit
-            </Link>
-          ) : (
-            <span className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
-              View Only
-            </span>
-          )}
+          <div className="flex items-center gap-4">
+            {task.canEdit ? (
+              <>
+                <Link
+                  href={`/projects/${projectId}?editTaskId=${task.id}`}
+                  className="font-mono text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[var(--color-ink)] hover:text-[var(--color-accent)]"
+                >
+                  Edit
+                </Link>
+                <button
+                  onClick={handleDelete}
+                  className={[
+                    "font-mono text-[0.65rem] font-bold uppercase tracking-[0.2em] transition-colors",
+                    isConfirmingDelete ? "text-[var(--color-accent)] animate-pulse" : "text-[var(--color-muted)] hover:text-[var(--color-accent)]"
+                  ].join(" ")}
+                >
+                  {isConfirmingDelete ? "Click to Confirm" : "Delete"}
+                </button>
+              </>
+            ) : (
+              <span className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
+                View Only
+              </span>
+            )}
+          </div>
 
           {task.canUpdateStatus && (
             <div className="relative" ref={statusMenuRef}>

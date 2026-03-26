@@ -321,3 +321,64 @@ export async function updateTaskStatusAction(
     message: "任务状态已更新。",
   };
 }
+
+export async function deleteTaskAction(
+  projectId: string,
+  taskId: string,
+): Promise<TaskActionState> {
+  const sessionUser = await getSessionUser();
+
+  if (!sessionUser) {
+    return {
+      status: "error",
+      message: "未登录，无法删除任务。",
+    };
+  }
+
+  const supabaseClient = await getServerSupabaseClient();
+  const { data: existingTask, error: existingTaskError } = await supabaseClient
+    .from("tasks")
+    .select("id, project_id, assignee_id, creator_id")
+    .eq("id", taskId)
+    .maybeSingle();
+
+  if (existingTaskError || !existingTask) {
+    return {
+      status: "error",
+      message: "未找到需要删除的任务。",
+    };
+  }
+
+  const canDelete = canMutateTask({
+    actorId: sessionUser.id,
+    actorRole: sessionUser.role,
+    assigneeId: existingTask.assignee_id,
+    creatorId: existingTask.creator_id,
+  });
+
+  if (!canDelete) {
+    return {
+      status: "error",
+      message: "你没有权限删除这个任务。",
+    };
+  }
+
+  const { error: deleteTaskError } = await supabaseClient
+    .from("tasks")
+    .delete()
+    .eq("id", taskId);
+
+  if (deleteTaskError) {
+    return {
+      status: "error",
+      message: `删除失败: ${deleteTaskError.message}`,
+    };
+  }
+
+  revalidateTaskViews(projectId);
+
+  return {
+    status: "success",
+    message: "任务已成功清除。",
+  };
+}
