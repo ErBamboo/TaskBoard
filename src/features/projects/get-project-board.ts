@@ -12,6 +12,7 @@ import type {
   TaskStatus,
 } from "@/types/database";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
+import { resolveRelation } from "@/lib/supabase/utils";
 
 export type ProjectBoardTask = {
   assigneeId: string;
@@ -139,12 +140,6 @@ function buildEmptyProjectBoardResponse(
     subsystems: [],
     totalTaskCount: 0,
   };
-}
-
-function resolveRelation<T>(relation: T | T[] | null | undefined, fallbackValue: T): T {
-  if (!relation) return fallbackValue;
-  if (Array.isArray(relation)) return relation[0] ?? fallbackValue;
-  return relation;
 }
 
 function sanitizeFilterValue(filterValue: string | string[] | undefined) {

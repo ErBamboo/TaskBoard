@@ -4,6 +4,7 @@ import type {
 } from "@/types/database";
 import { getSessionUser } from "@/lib/auth/get-session-user";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
+import { resolveRelation } from "@/lib/supabase/utils";
 
 export type DashboardTask = {
   blockedReason: string;
@@ -34,11 +35,11 @@ type RawDashboardTask = {
   due_at: string | null;
   id: string;
   is_integration_task: boolean;
-  milestone: Array<{ name: string }> | null;
+  milestone: { name: string } | null;
   priority: TaskPriority;
-  project: Array<{ id: string; name: string }> | null;
+  project: { id: string; name: string } | null;
   status: TaskStatus;
-  subsystem: Array<{ name: string }> | null;
+  subsystem: { name: string } | null;
   title: string;
 };
 
@@ -48,13 +49,6 @@ const emptyDashboardTaskGroups: DashboardTaskGroups = {
   blocked: [],
   done: [],
 };
-
-function extractRelationName(
-  relation: Array<{ name: string }> | null | undefined,
-  fallbackName: string,
-) {
-  return relation?.[0]?.name ?? fallbackName;
-}
 
 export function groupTasksByStatus(tasks: DashboardTask[]) {
   return tasks.reduce<DashboardTaskGroups>((groupedTasks, task) => {
@@ -99,22 +93,30 @@ export async function getMyTaskDashboard(): Promise<DashboardSummary | null> {
   }
 
   const dashboardTasks = ((data ?? []) as unknown as RawDashboardTask[]).map(
-    (rawDashboardTask): DashboardTask => ({
-      id: rawDashboardTask.id,
-      title: rawDashboardTask.title,
-      status: rawDashboardTask.status,
-      priority: rawDashboardTask.priority,
-      dueAt: rawDashboardTask.due_at,
-      blockedReason: rawDashboardTask.blocked_reason,
-      isIntegrationTask: rawDashboardTask.is_integration_task,
-      projectId: rawDashboardTask.project?.[0]?.id,
-      projectName: extractRelationName(rawDashboardTask.project, "未知项目"),
-      subsystemName: extractRelationName(
-        rawDashboardTask.subsystem,
-        "未分配子系统",
-      ),
-      milestoneName: rawDashboardTask.milestone?.[0]?.name ?? null,
-    }),
+    (rawDashboardTask): DashboardTask => {
+      const project = resolveRelation(rawDashboardTask.project, {
+        id: "",
+        name: "未知项目",
+      });
+      const subsystem = resolveRelation(rawDashboardTask.subsystem, {
+        name: "未分配子系统",
+      });
+      const milestone = resolveRelation(rawDashboardTask.milestone, null);
+
+      return {
+        id: rawDashboardTask.id,
+        title: rawDashboardTask.title,
+        status: rawDashboardTask.status,
+        priority: rawDashboardTask.priority,
+        dueAt: rawDashboardTask.due_at,
+        blockedReason: rawDashboardTask.blocked_reason,
+        isIntegrationTask: rawDashboardTask.is_integration_task,
+        projectId: project.id,
+        projectName: project.name,
+        subsystemName: subsystem.name,
+        milestoneName: milestone?.name ?? null,
+      };
+    },
   );
 
   return {
